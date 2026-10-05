@@ -27,10 +27,17 @@ export default async function handler(req, res) {
       let text = await response.text();
 
       // Check karo ki asli m3u8 mila ya error page
-      if (!text.includes('#EXTM3U')) {
-        console.error('Not a valid m3u8. First 200 chars:', text.slice(0, 200));
+            if (!text.includes('#EXTM3U')) {
+        console.error('=== UPSTREAM RESPONSE DEBUG ===');
+        console.error('Status:', response.status);
+        console.error('Final URL:', finalUrl);
+        console.error('Content-Type:', contentType);
+        console.error('First 500 chars:', text.slice(0, 500));
+        console.error('===============================');
         res.setHeader('Content-Type', 'text/plain');
-        return res.status(502).send('Upstream ne valid m3u8 nahi diya. Ho sakta hai geo-blocked hai.');
+        return res.status(502).send(
+          `Upstream error.\nStatus: ${response.status}\nFinal URL: ${finalUrl}\nFirst 500 chars:\n${text.slice(0, 500)}`
+        );
       }
 
       const base = new URL(finalUrl);
