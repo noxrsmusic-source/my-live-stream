@@ -1,4 +1,4 @@
-name: Update FanCode HLS
+name: Sync FanCode HLS
 
 on:
   schedule:
@@ -9,39 +9,23 @@ permissions:
   contents: write
 
 jobs:
-  update:
+  sync:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout my repo
         uses: actions/checkout@v4
 
-      - name: Checkout FanCode fetcher
-        uses: actions/checkout@v4
-        with:
-          repository: byte-capsule/FanCode-Hls-Fetcher
-          path: fetcher
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
-
-      - name: Run fetcher
+      - name: Download latest files from FanCode fetcher
         run: |
-          cd fetcher
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          python main.py
-
-      - name: Copy output files
-        run: |
-          cp fetcher/Fancode_hls_m3u8.Json ./Fancode_hls_m3u8.Json || true
-          cp fetcher/Fancode_Live.m3u ./Fancode_Live.m3u || true
+          curl -L -o Fancode_hls_m3u8.Json \
+            https://raw.githubusercontent.com/byte-capsule/FanCode-Hls-Fetcher/main/Fancode_hls_m3u8.Json
+          curl -L -o Fancode_Live.m3u \
+            https://raw.githubusercontent.com/byte-capsule/FanCode-Hls-Fetcher/main/Fancode_Live.m3u
 
       - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add Fancode_hls_m3u8.Json Fancode_Live.m3u
-          git diff --quiet && git diff --staged --quiet || git commit -m "Auto-update HLS links"
+          git diff --quiet && git diff --staged --quiet || git commit -m "Sync HLS links"
           git push
