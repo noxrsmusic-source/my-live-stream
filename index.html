@@ -2,21 +2,32 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Live Sports</title>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <style>
-    body { background: #111; color: #fff; font-family: sans-serif; margin: 0; }
+    * { box-sizing: border-box; }
+    body { background: #111; color: #fff; font-family: -apple-system, sans-serif; margin: 0; }
     #wrap { max-width: 900px; margin: 20px auto; padding: 0 12px; }
-    video { width: 100%; background: #000; }
-    .list { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
-    .card { background: #222; padding: 12px; border-radius: 8px; cursor: pointer; width: 200px; text-align: center; }
-    .card img { width: 100%; border-radius: 4px; }
-    .card:hover { background: #333; }
+    video { width: 100%; background: #000; border-radius: 8px; }
+    h2 { margin: 24px 0 12px; }
+    .list { display: flex; flex-wrap: wrap; gap: 12px; }
+    .card {
+      background: #1c1c1c; padding: 12px; border-radius: 8px;
+      cursor: pointer; width: 200px; text-align: center;
+      transition: 0.2s;
+    }
+    .card:hover { background: #2a2a2a; transform: translateY(-2px); }
+    .card img { width: 100%; height: 120px; object-fit: cover; border-radius: 4px; }
+    .card p { margin: 8px 0 4px; font-size: 13px; font-weight: 600; }
+    .card small { color: #888; font-size: 11px; text-transform: uppercase; }
+    .empty { color: #888; padding: 20px; text-align: center; }
   </style>
 </head>
 <body>
   <div id="wrap">
     <video id="video" controls autoplay muted playsinline></video>
+    <h2>🔴 Live Matches</h2>
     <div class="list" id="list"></div>
   </div>
 
@@ -25,21 +36,40 @@
     let hls = null;
 
     async function load() {
-      const res = await fetch('/api/streams');
-      const matches = await res.json();
-      const list = document.getElementById('list');
-      list.innerHTML = '';
+      try {
+        const res = await fetch('/api/streams');
+        const data = await res.json();
 
-      matches.forEach(m => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `<img src="${m.logo}" alt="${m.name}" /><p>${m.name}</p>`;
-        card.onclick = () => play(m.url);
-        list.appendChild(card);
-      });
+        // JSON structure: { matches: [ {...}, {...} ] }
+        const matches = data.matches || [];
+
+        const list = document.getElementById('list');
+        list.innerHTML = '';
+
+        if (!matches.length) {
+          list.innerHTML = '<div class="empty">Abhi koi live match nahi hai.</div>';
+          return;
+        }
+
+        matches.forEach(m => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <img src="${m.banner || m.team_1_flag}" alt="${m.match_name}" onerror="this.src='${m.team_1_flag}'" />
+            <small>${m.event_category || 'Live'}</small>
+            <p>${m.match_name}</p>
+          `;
+          card.onclick = () => play(m.stream_link);
+          list.appendChild(card);
+        });
+      } catch (err) {
+        console.error('Load failed:', err);
+        document.getElementById('list').innerHTML = '<div class="empty">Load karne me error aayi.</div>';
+      }
     }
 
     function play(url) {
+      if (!url) return alert('Stream link available nahi hai');
       const proxied = `/api/proxy?url=${encodeURIComponent(url)}`;
 
       if (hls) { hls.destroy(); hls = null; }
@@ -48,10 +78,19 @@
         hls = new Hls();
         hls.loadSource(proxied);
         hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED, () => video.play().catch(() => {}));
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+          video.play().catch(() => {});
+          video.scrollIntoView({ behavior: 'smooth' });
+        });
+        hls.on(Hls.Events.ERROR, (e, data) => {
+          console.error('HLS error:', data);
+          if (data.fatal) alert('Stream chalane me error aayi. Ho sakta hai match India ke bahar blocked ho.');
+        });
       } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
         video.src = proxied;
         video.play().catch(() => {});
+      } else {
+        alert('Browser HLS support nahi karta');
       }
     }
 
