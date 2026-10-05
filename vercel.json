@@ -2,6 +2,9 @@
   "functions": {
     "api/proxy.js": {
       "regions": ["bom1"]
+    },
+    "api/streams.js": {
+      "regions": ["bom1"]
     }
   }
 }
