@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Live Sports</title>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <style>
+    body { background: #111; color: #fff; font-family: sans-serif; margin: 0; }
+    #wrap { max-width: 900px; margin: 20px auto; padding: 0 12px; }
+    video { width: 100%; background: #000; }
+    .list { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+    .card { background: #222; padding: 12px; border-radius: 8px; cursor: pointer; width: 200px; text-align: center; }
+    .card img { width: 100%; border-radius: 4px; }
+    .card:hover { background: #333; }
+  </style>
+</head>
+<body>
+  <div id="wrap">
+    <video id="video" controls autoplay muted playsinline></video>
+    <div class="list" id="list"></div>
+  </div>
+
+  <script>
+    const video = document.getElementById('video');
+    let hls = null;
+
+    async function load() {
+      const res = await fetch('/api/streams');
+      const matches = await res.json();
+      const list = document.getElementById('list');
+      list.innerHTML = '';
+
+      matches.forEach(m => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `<img src="${m.logo}" alt="${m.name}" /><p>${m.name}</p>`;
+        card.onclick = () => play(m.url);
+        list.appendChild(card);
+      });
+    }
+
+    function play(url) {
+      const proxied = `/api/proxy?url=${encodeURIComponent(url)}`;
+
+      if (hls) { hls.destroy(); hls = null; }
+
+      if (Hls.isSupported()) {
+        hls = new Hls();
+        hls.loadSource(proxied);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED, () => video.play().catch(() => {}));
+      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = proxied;
+        video.play().catch(() => {});
+      }
+    }
+
+    load();
+  </script>
+</body>
+</html>
