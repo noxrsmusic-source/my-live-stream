@@ -3,9 +3,21 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Rewarded Ads</title>
+  <title>Coin Earn — Watch & Win</title>
+
+  <!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script src="//libtl.com/sdk.js" data-zone="12008763" data-sdk="show_12008763"></script>
+
+  <!-- ============================================================
+       MONETAG SDK — Zone ID: 12008763
+       ⚠️ Neeche wala script tag Monetag dashboard se EXACT copy karo
+       Dashboard → Telegram Mini Apps → Zone 12008763 → SDK/Tag
+       ============================================================ -->
+  <script
+    src="https://libtl.com/sdk.js"
+    data-zone="12008763"
+    data-sdk="show_12008763"
+  ></script>
 
   <style>
     :root {
@@ -23,31 +35,44 @@
       background: var(--card); border-radius: 16px; padding: 20px;
       margin-bottom: 14px; border: 1px solid rgba(255,255,255,.06);
     }
-    .balance { font-size: 44px; font-weight: 700; line-height: 1; letter-spacing: -1px; }
+    .balance { font-size: 48px; font-weight: 800; line-height: 1; letter-spacing: -1px; }
     .balance small { font-size: 16px; color: var(--muted); font-weight: 500; margin-left: 6px; }
-    .label { color: var(--muted); font-size: 13px; text-transform: uppercase; letter-spacing: .08em; }
-    .user { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+    .label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .1em; }
+    .user { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
     .avatar {
-      width: 44px; height: 44px; border-radius: 50%;
+      width: 48px; height: 48px; border-radius: 50%;
       background: linear-gradient(135deg, #2ea6ff, #7c3aed);
-      display: grid; place-items: center; font-weight: 700; font-size: 18px; flex-shrink: 0;
+      display: grid; place-items: center; font-weight: 700; font-size: 20px;
+      flex-shrink: 0; overflow: hidden;
     }
-    .user-name { font-weight: 600; font-size: 16px; }
-    .user-id { color: var(--muted); font-size: 13px; }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .user-name { font-weight: 700; font-size: 17px; }
+    .user-id { color: var(--muted); font-size: 13px; margin-top: 2px; }
     button {
-      width: 100%; border: 0; border-radius: 14px; padding: 16px;
-      font-size: 16px; font-weight: 600; color: #fff; background: var(--accent);
+      width: 100%; border: 0; border-radius: 14px; padding: 18px;
+      font-size: 17px; font-weight: 700; color: #fff; background: var(--accent);
       cursor: pointer; transition: transform .08s ease, opacity .2s ease;
     }
-    button:active { transform: scale(.98); }
-    button:disabled { opacity: .5; cursor: not-allowed; }
+    button:active { transform: scale(.97); }
+    button:disabled { opacity: .45; cursor: not-allowed; }
     .status {
-      margin-top: 12px; font-size: 14px; text-align: center;
-      min-height: 20px; color: var(--muted);
+      margin-top: 14px; font-size: 14px; text-align: center;
+      min-height: 22px; color: var(--muted); line-height: 1.4;
     }
-    .status.ok { color: var(--ok); }
-    .status.err { color: var(--err); }
-    .note { font-size: 12px; color: var(--muted); line-height: 1.6; }
+    .status.ok { color: var(--ok); font-weight: 600; }
+    .status.err { color: var(--err); font-weight: 600; }
+    .note { font-size: 12px; color: var(--muted); line-height: 1.7; }
+    .spinner {
+      display: inline-block; width: 14px; height: 14px; margin-right: 6px;
+      border: 2px solid rgba(255,255,255,.3); border-top-color: #fff;
+      border-radius: 50%; animation: spin .8s linear infinite; vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .badge {
+      display: inline-block; padding: 2px 8px; border-radius: 20px;
+      background: rgba(46,166,255,.15); color: var(--accent);
+      font-size: 11px; font-weight: 700; margin-left: 8px;
+    }
   </style>
 </head>
 <body>
@@ -60,42 +85,36 @@
           <div class="user-id" id="userId">—</div>
         </div>
       </div>
-      <div class="label">Coins</div>
+      <div class="label">Your Balance</div>
       <div class="balance" id="balance">0<small>coins</small></div>
     </div>
 
     <div class="card">
-      <button id="watchBtn" disabled>Watch Ad (+5 coins)</button>
+      <button id="watchBtn" disabled>🎬 Watch Ad — Earn 5 Coins</button>
       <div class="status" id="status">Initializing…</div>
     </div>
 
     <div class="card">
       <div class="note">
-        Reward sirf tab credit hota hai jab Monetag ka server hamare backend ko
-        postback bhejta hai. Frontend se coins kabhi add nahi hote.
+        ✅ Reward <strong>only credited</strong> when Monetag's server sends a verified
+        postback to our backend. Frontend never adds coins directly.<br>
+        🔒 Duplicate protection via unique <code>ymid</code> per ad event.
       </div>
     </div>
   </div>
 
   <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {
-  getAuth, signInWithCustomToken, onAuthStateChanged,
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import {
-  getDatabase, ref, onValue,
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-/* ------------------------------------------------------------
-   1. CONFIG  (✅ syntax fixed)
-   ------------------------------------------------------------ */
+/* ============================================================
+   CONFIG
+   ============================================================ */
 const CONFIG = {
   MONETAG_ZONE_ID: "12008763",
   MONETAG_SDK_FN: "show_12008763",
   REWARD_COINS: 5,
 
-  // ❗ YAHAN apna real backend URL daalo — ye placeholder hai
-  API_BASE: "https://your-backend.example.com",
+  // ⚠️ Firebase Cloud Functions base URL
+  // Deploy ke baad milega: https://us-central1-bizzsite-64a49.cloudfunctions.net/api
+  API_BASE: "https://us-central1-bizzsite-64a49.cloudfunctions.net/api",
 
   FIREBASE: {
     apiKey: "AIzaSyC7nVNy-yMFCfrJBCQhnsYPDByIt1dks7Y",
@@ -105,23 +124,30 @@ const CONFIG = {
     storageBucket: "bizzsite-64a49.firebasestorage.app",
     messagingSenderId: "679795665521",
     appId: "1:679795665521:web:68a70ebb310a40365f09d0",
-    measurementId: "G-ESMJS4N163"
-  },                              // <-- fixed: } not };
+  },
 
   REWARD_POLL_INTERVAL_MS: 1500,
-  REWARD_POLL_TIMEOUT_MS: 45000,
-};                                // <-- CONFIG closes here
+  REWARD_POLL_TIMEOUT_MS: 60000,
+};
 
-/* ------------------------------------------------------------
-   2. FIREBASE INIT
-   ------------------------------------------------------------ */
+/* ============================================================
+   FIREBASE IMPORTS
+   ============================================================ */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getAuth, signInWithCustomToken, onAuthStateChanged,
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  getDatabase, ref, onValue,
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+/* ============================================================
+   INIT
+   ============================================================ */
 const firebaseApp = initializeApp(CONFIG.FIREBASE);
 const auth = getAuth(firebaseApp);
 const db = getDatabase(firebaseApp);
 
-/* ------------------------------------------------------------
-   3. TELEGRAM WEBAPP
-   ------------------------------------------------------------ */
 const tg = window.Telegram?.WebApp;
 if (tg) {
   tg.ready();
@@ -131,9 +157,9 @@ if (tg) {
   tg.setBackgroundColor?.("#0f1115");
 }
 
-/* ------------------------------------------------------------
-   4. DOM
-   ------------------------------------------------------------ */
+/* ============================================================
+   DOM
+   ============================================================ */
 const el = {
   avatar: document.getElementById("avatar"),
   userName: document.getElementById("userName"),
@@ -143,27 +169,31 @@ const el = {
   status: document.getElementById("status"),
 };
 
-function setStatus(msg, kind = "") {
-  el.status.textContent = msg;
+function setStatus(html, kind = "") {
+  el.status.innerHTML = html;
   el.status.className = "status" + (kind ? " " + kind : "");
 }
 function setBalance(n) {
   el.balance.innerHTML = `${n}<small>coins</small>`;
 }
 
-/* ------------------------------------------------------------
-   5. STATE
-   ------------------------------------------------------------ */
-const state = { uid: null, balance: 0, adInFlight: false, currentSessionId: null };
+/* ============================================================
+   STATE
+   ============================================================ */
+const state = {
+  uid: null,
+  balance: 0,
+  adInFlight: false,
+};
 
-/* ------------------------------------------------------------
-   6. AUTH
-   ------------------------------------------------------------ */
+/* ============================================================
+   1. TELEGRAM AUTH → Firebase custom token
+   ============================================================ */
 async function authenticateWithBackend() {
   const initData = tg?.initData;
   if (!initData) throw new Error("Telegram initData nahi mila. Mini App ke andar kholo.");
 
-  const res = await fetch(`${CONFIG.API_BASE}/api/auth/telegram`, {
+  const res = await fetch(`${CONFIG.API_BASE}/auth/telegram`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ initData }),
@@ -175,22 +205,30 @@ async function authenticateWithBackend() {
   }
 
   const data = await res.json();
-  if (!data.customToken || !data.uid) throw new Error("Backend ne customToken ya uid nahi diya.");
+  if (!data.customToken || !data.uid) {
+    throw new Error("Backend ne customToken ya uid nahi diya.");
+  }
 
   await signInWithCustomToken(auth, data.customToken);
 
   const u = data.user || {};
-  el.userName.textContent = [u.first_name, u.last_name].filter(Boolean).join(" ") || "Telegram User";
-  el.userId.textContent = u.username ? `@${u.username}` : `ID: ${data.uid}`;
-  el.avatar.textContent = (u.first_name?.[0] || "?").toUpperCase();
+  el.userName.textContent =
+    [u.first_name, u.last_name].filter(Boolean).join(" ") || "Telegram User";
+  el.userId.textContent = u.username ? `@${u.username}` : `ID: ${u.id}`;
+
+  if (u.photo_url) {
+    el.avatar.innerHTML = `<img src="${u.photo_url}" alt="" />`;
+  } else {
+    el.avatar.textContent = (u.first_name?.[0] || "?").toUpperCase();
+  }
 
   state.uid = data.uid;
   return data;
 }
 
-/* ------------------------------------------------------------
-   7. BALANCE LISTENER
-   ------------------------------------------------------------ */
+/* ============================================================
+   2. LIVE BALANCE LISTENER (Realtime DB)
+   ============================================================ */
 let unsubBalance = null;
 function listenBalance(uid) {
   if (unsubBalance) unsubBalance();
@@ -203,14 +241,14 @@ function listenBalance(uid) {
   });
 }
 
-/* ------------------------------------------------------------
-   8. AD SESSION
-   ------------------------------------------------------------ */
+/* ============================================================
+   3. AD SESSION — backend se unique ymid
+   ============================================================ */
 async function requestAdSession() {
   if (!auth.currentUser) throw new Error("Login nahi hai.");
   const idToken = await auth.currentUser.getIdToken(true);
 
-  const res = await fetch(`${CONFIG.API_BASE}/api/ad/session`, {
+  const res = await fetch(`${CONFIG.API_BASE}/ad/session`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -218,7 +256,6 @@ async function requestAdSession() {
     },
     body: JSON.stringify({
       zoneId: CONFIG.MONETAG_ZONE_ID,
-      tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
     }),
   });
 
@@ -228,14 +265,20 @@ async function requestAdSession() {
   }
 
   const data = await res.json();
-  if (!data.ymid || !data.sessionId) throw new Error("Backend ne ymid/sessionId nahi diya.");
+  if (!data.ymid || !data.sessionId) {
+    throw new Error("Backend ne ymid/sessionId nahi diya.");
+  }
   return data;
 }
 
-/* ------------------------------------------------------------
-   9. MONETAG SDK
-   ------------------------------------------------------------ */
-function callMonetagSdk({ ymid, zoneId }) {
+/* ============================================================
+   4. MONETAG SDK CALL — ymid pass
+   ------------------------------------------------------------
+   Monetag SDK docs ke mutabik:
+     show_XXXXX({ ymid: 'unique_id' })
+   Promise return karta hai jo ad complete hone par resolve hota hai.
+   ============================================================ */
+function callMonetagSdk({ ymid }) {
   return new Promise((resolve, reject) => {
     const fn = window[CONFIG.MONETAG_SDK_FN];
     if (typeof fn !== "function") {
@@ -253,19 +296,21 @@ function callMonetagSdk({ ymid, zoneId }) {
       ok ? resolve(payload) : reject(payload);
     };
 
-    const guard = setTimeout(() => done(false, new Error("Monetag SDK timeout.")), 120000);
+    const guard = setTimeout(
+      () => done(false, new Error("Ad timeout — 2 min se zyada lag gaya.")),
+      130000
+    );
 
     try {
-      const p = fn({
-        type: "rewarded",
-        ymid,
-        zone: zoneId,
-        onReward: () => done(true, { via: "onReward" }),
-        onClose:  () => done(true, { via: "onClose" }),
-        onError:  (e) => done(false, e || new Error("SDK error")),
-      });
+      // Monetag SDK: ymid pass karo, Promise return karta hai
+      const p = fn({ ymid });
+
       if (p && typeof p.then === "function") {
-        p.then((r) => done(true, r)).catch((e) => done(false, e));
+        p.then(() => done(true, { via: "promise" }))
+         .catch((e) => done(false, e || new Error("Ad close/error")));
+      } else {
+        // Agar promise nahi, to 5s wait karo (kuch SDK versions resolve karte hain)
+        setTimeout(() => done(true, { via: "fallback" }), 5000);
       }
     } catch (e) {
       done(false, e);
@@ -273,9 +318,9 @@ function callMonetagSdk({ ymid, zoneId }) {
   });
 }
 
-/* ------------------------------------------------------------
-   10. REWARD CONFIRM
-   ------------------------------------------------------------ */
+/* ============================================================
+   5. REWARD CONFIRMATION — postback ka wait
+   ============================================================ */
 async function waitForRewardConfirmation(sessionId, prevBalance) {
   const start = Date.now();
   const idToken = await auth.currentUser.getIdToken(true);
@@ -283,7 +328,7 @@ async function waitForRewardConfirmation(sessionId, prevBalance) {
   while (Date.now() - start < CONFIG.REWARD_POLL_TIMEOUT_MS) {
     try {
       const res = await fetch(
-        `${CONFIG.API_BASE}/api/ad/session/${encodeURIComponent(sessionId)}`,
+        `${CONFIG.API_BASE}/ad/session/${encodeURIComponent(sessionId)}`,
         { headers: { Authorization: `Bearer ${idToken}` } }
       );
       if (res.ok) {
@@ -292,11 +337,12 @@ async function waitForRewardConfirmation(sessionId, prevBalance) {
           return { credited: true, coins: data.coins ?? CONFIG.REWARD_COINS };
         }
         if (data.status === "rejected") {
-          return { credited: false, reason: data.reason || "Monetag ne ad reject kar diya." };
+          return { credited: false, reason: data.reason || "Ad reject ho gaya." };
         }
       }
     } catch (_) {}
 
+    // Fast path: Firebase listener se balance badh gaya
     if (state.balance > prevBalance) {
       return { credited: true, coins: state.balance - prevBalance };
     }
@@ -306,57 +352,65 @@ async function waitForRewardConfirmation(sessionId, prevBalance) {
   return { credited: false, reason: "Reward timeout — postback nahi aaya." };
 }
 
-/* ------------------------------------------------------------
-   11. WATCH AD
-   ------------------------------------------------------------ */
+/* ============================================================
+   6. MAIN — Watch Ad
+   ============================================================ */
 async function handleWatchAd() {
   if (state.adInFlight) return;
-  if (!auth.currentUser) { setStatus("Login complete hone do…", "err"); return; }
+  if (!auth.currentUser) {
+    setStatus("Login complete hone do…", "err");
+    return;
+  }
 
   state.adInFlight = true;
   el.watchBtn.disabled = true;
-  setStatus("Ad session bana rahe hain…");
   const prevBalance = state.balance;
 
   try {
+    setStatus('<span class="spinner"></span>Ad session ban raha hai…');
+
+    // 1. Backend se unique ymid lo
     const session = await requestAdSession();
-    state.currentSessionId = session.sessionId;
 
-    setStatus("Ad load ho raha hai…");
-    await callMonetagSdk({
-      ymid: session.ymid,
-      zoneId: session.zoneId || CONFIG.MONETAG_ZONE_ID,
-    });
+    setStatus('<span class="spinner"></span>Ad load ho raha hai…');
 
-    setStatus("Ad complete — reward verify ho raha hai…");
+    // 2. Monetag SDK call
+    await callMonetagSdk({ ymid: session.ymid });
+
+    // 3. Backend postback wait
+    setStatus('<span class="spinner"></span>Ad complete — reward verify ho raha hai…');
     const result = await waitForRewardConfirmation(session.sessionId, prevBalance);
 
-    if (result.credited) setStatus(`+${result.coins} coins credit ho gaye ✅`, "ok");
-    else setStatus(result.reason || "Reward nahi mila.", "err");
+    if (result.credited) {
+      setStatus(`🎉 +${result.coins} coins credit ho gaye!`, "ok");
+      if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred("success");
+    } else {
+      setStatus(result.reason || "Reward nahi mila.", "err");
+      if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred("error");
+    }
   } catch (err) {
     console.error("[watchAd]", err);
     setStatus(err?.message || "Ad fail ho gaya.", "err");
   } finally {
     state.adInFlight = false;
-    state.currentSessionId = null;
     el.watchBtn.disabled = false;
   }
 }
 
-/* ------------------------------------------------------------
-   12. BOOT
-   ------------------------------------------------------------ */
+/* ============================================================
+   7. BOOT
+   ============================================================ */
 async function boot() {
   el.watchBtn.disabled = true;
-  setStatus("Telegram login verify ho raha hai…");
+  setStatus('<span class="spinner"></span>Telegram login verify ho raha hai…');
 
   try {
     await authenticateWithBackend();
-    setStatus("Firebase connect ho raha hai…");
     listenBalance(state.uid);
-    await new Promise((r) => setTimeout(r, 800));
+    await new Promise((r) => setTimeout(r, 700));
+
     el.watchBtn.disabled = false;
-    setStatus("Ready — ad dekh ke coins kamao.", "ok");
+    setStatus("Ready — ad dekh ke coins kamao! 🚀", "ok");
   } catch (err) {
     console.error("[boot]", err);
     setStatus(err?.message || "Init fail.", "err");
@@ -370,6 +424,7 @@ onAuthStateChanged(auth, (user) => {
     listenBalance(user.uid);
   }
 });
+
 boot();
   </script>
 </body>
