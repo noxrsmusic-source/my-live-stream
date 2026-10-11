@@ -7,10 +7,10 @@
   <meta name="theme-color" content="#0b0b12">
   <title>AdCoins — Watch & Earn</title>
 
-  <!-- Telegram Mini App SDK -->
+  <!-- Telegram Mini App -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-  <!-- Your Monetag zone: 12008763 -->
+  <!-- Monetag SDK: Zone 12008763 -->
   <script src="https://libtl.com/sdk.js"
           data-zone="12008763"
           data-sdk="show_12008763"></script>
@@ -24,7 +24,6 @@
     :root {
       --bg: #0b0b12;
       --panel: #171724;
-      --text: #f7f5ff;
       --muted: #aaa7c0;
       --purple: #8b5cf6;
       --pink: #d946ef;
@@ -36,10 +35,8 @@
     body {
       margin: 0;
       min-height: 100vh;
-      color: var(--text);
-      background:
-        radial-gradient(ellipse at top, #38215f 0%, transparent 42%),
-        var(--bg);
+      color: #f7f5ff;
+      background: radial-gradient(ellipse at top, #38215f, transparent 43%), var(--bg);
       font-family: Inter, system-ui, Arial, sans-serif;
     }
 
@@ -78,20 +75,18 @@
     }
 
     .user-pill {
-      max-width: 160px;
+      max-width: 165px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
       padding: 9px 12px;
-      border: 1px solid #ffffff16;
+      border: 1px solid #ffffff18;
       border-radius: 50px;
       color: #ded9f5;
       font-size: 12px;
     }
 
     .hero {
-      position: relative;
-      overflow: hidden;
       padding: 25px 21px;
       border: 1px solid #a78bfa35;
       border-radius: 25px;
@@ -158,11 +153,12 @@
       background: linear-gradient(100deg, var(--purple), var(--pink));
       box-shadow: 0 8px 25px #8b5cf644;
       font-weight: 800;
-      transition: transform .15s, opacity .15s;
     }
 
-    .watch-btn:active { transform: scale(.98); }
-    .watch-btn:disabled { opacity: .5; cursor: not-allowed; }
+    .watch-btn:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
 
     .stats {
       display: grid;
@@ -235,8 +231,6 @@
       line-height: 1.6;
     }
 
-    .notice strong { color: #f7d58c; }
-
     .footer {
       display: flex;
       justify-content: space-around;
@@ -248,7 +242,12 @@
     }
 
     .footer div { text-align: center; }
-    .footer b { display: block; margin-bottom: 5px; color: #c4b5fd; font-size: 20px; }
+    .footer b {
+      display: block;
+      margin-bottom: 5px;
+      color: #c4b5fd;
+      font-size: 20px;
+    }
 
     .toast {
       position: fixed;
@@ -291,7 +290,7 @@
       <div class="logo">◈</div>
       <span>AdCoins</span>
     </div>
-    <div class="user-pill" id="userPill">Telegram user</div>
+    <div class="user-pill" id="userPill">Connecting...</div>
   </header>
 
   <section class="hero">
@@ -306,7 +305,7 @@
     <div class="subtext">Earn 5 coins for each verified rewarded ad</div>
 
     <button class="watch-btn" id="watchBtn" disabled>
-      ▶ <span id="watchText">Connecting securely...</span>
+      ▶ <span id="watchText">Checking setup...</span>
     </button>
   </section>
 
@@ -341,15 +340,15 @@
     <div class="task-icon">🛡️</div>
     <div class="task-info">
       <div class="task-name">Secure rewards</div>
-      <div class="task-desc">Duplicate reward notifications must not add extra coins.</div>
+      <div class="task-desc">Coins are credited after server verification.</div>
     </div>
-    <div class="reward">Verified</div>
+    <div class="reward">Secure</div>
   </div>
 
   <div class="notice">
-    <strong>ⓘ Note:</strong>
+    <strong>ⓘ Important:</strong>
     Coins are points only and cannot currently be withdrawn.
-    Closing an ad does not automatically qualify you for a reward.
+    Closing an ad does not automatically guarantee a reward.
   </div>
 
   <nav class="footer">
@@ -389,10 +388,14 @@
   }
 
   /*
-    CONFIGURATION REQUIRED:
-    1. Replace Firebase values below with your own web-app config.
-    2. Deploy the Firebase Cloud Functions from your backend project.
-    3. Configure Monetag's verified postback on the server.
+    ADD YOUR FIREBASE WEB CONFIG BELOW.
+    Deploy the backend functions:
+      authenticateTelegram
+      createAdSession
+      getWallet
+
+    Firebase backend must validate Telegram initData.
+    The backend, not this page, credits the 5 coins.
   */
 
   const firebaseConfig = {
@@ -402,7 +405,7 @@
     appId: "YOUR_FIREBASE_APP_ID"
   };
 
-  const configured =
+  const firebaseConfigured =
     firebaseConfig.apiKey !== "YOUR_FIREBASE_API_KEY" &&
     firebaseConfig.projectId !== "YOUR_PROJECT_ID";
 
@@ -413,9 +416,9 @@
       return;
     }
 
-    if (!configured) {
+    if (!firebaseConfigured) {
       $("watchText").textContent = "Firebase setup required";
-      toast("Add your Firebase configuration first.");
+      toast("Add your Firebase config to enable secure rewards.");
       return;
     }
 
@@ -427,14 +430,11 @@
       const functions = firebase.app().functions("us-central1");
       const auth = firebase.auth();
 
-      // The backend must validate Telegram initData and return a Firebase custom token.
       const authenticate = functions.httpsCallable("authenticateTelegram");
-      const authResponse = await authenticate({
-        initData: tg.initData
-      });
+      const authResult = await authenticate({ initData: tg.initData });
 
       await auth.signInWithCustomToken(
-        authResponse.data.firebaseCustomToken
+        authResult.data.firebaseCustomToken
       );
 
       const getWallet = functions.httpsCallable("getWallet");
@@ -462,10 +462,9 @@
       $("watchBtn").addEventListener("click", async () => {
         if (busy) return;
 
-        const showAd = window.show_12008763;
-
-        if (typeof showAd !== "function") {
-          toast("Monetag ad SDK is not ready. Please try again.");
+        // This is the function from your Monetag dashboard.
+        if (typeof window.show_12008763 !== "function") {
+          toast("Monetag SDK is loading or unavailable. Try again.");
           return;
         }
 
@@ -474,42 +473,43 @@
         $("watchText").textContent = "Preparing ad...";
 
         try {
-          // Create a server-side session before opening the ad.
-          const sessionResponse = await createAdSession({
+          // Create a server-side session before showing the ad.
+          const sessionResult = await createAdSession({
             requestVar: "watch_button"
           });
 
-          const ymid = sessionResponse.data.ymid;
+          const ymid = sessionResult.data.ymid;
 
           $("watchText").textContent = "Opening ad...";
 
           /*
-            Confirm Monetag's current SDK example for passing ymid.
-            The server must correlate its postback to this session.
-            This frontend call never directly credits coins.
+            Exact Monetag example:
+              show_12008763().then(() => { ... })
+
+            The callback is for UI only.
+            It must not credit coins directly.
+            The backend postback must correlate this session's ymid.
           */
-          await showAd({ ymid: ymid });
+          await window.show_12008763();
 
-          toast("Ad closed. Waiting for server verification...");
+          toast("Ad closed. Waiting for reward verification...");
 
-          // Refresh only to show server-confirmed balances.
           let attempts = 0;
-
           const poll = setInterval(async () => {
             attempts++;
 
             try {
               await refreshWallet();
             } catch (error) {
-              console.error("Wallet refresh failed", error);
+              console.error("Wallet refresh failed:", error);
             }
 
             if (attempts >= 12) clearInterval(poll);
           }, 5000);
 
         } catch (error) {
-          console.error("Ad flow error:", error);
-          toast("Ad unavailable or reward pending. No coins were added by this button.");
+          console.error("Rewarded ad error:", error);
+          toast("Ad unavailable or reward pending. No coins added directly.");
         } finally {
           busy = false;
           $("watchBtn").disabled = false;
@@ -518,9 +518,9 @@
       });
 
     } catch (error) {
-      console.error("Startup error:", error);
+      console.error("Firebase startup error:", error);
       $("watchText").textContent = "Secure login failed";
-      toast("Check your Firebase setup and Telegram verification function.");
+      toast("Check Firebase setup and Telegram verification.");
     }
   }
 
