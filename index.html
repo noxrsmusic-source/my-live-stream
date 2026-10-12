@@ -2,20 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
-  <meta name="theme-color" content="#0f1115" />
-  <title>Coin Earn — Watch & Win</title>
-
-  <!-- Telegram WebApp SDK -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Ad Test — Coin Earn</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-  <!-- ============================================================
-       MONETAG SDK — Zone ID: 12008763
-       ------------------------------------------------------------
-       ⚠️ IMPORTANT: Ye script tag Monetag dashboard se EXACT copy karo.
-       Dashboard → Telegram Mini Apps → Zone 12008763 → SDK/Tag.
-       Agar tumhara tag alag hai to isko replace kar do.
-       ============================================================ -->
+  <!-- Monetag SDK — Zone 12008763 -->
   <script
     src="https://libtl.com/sdk.js"
     data-zone="12008763"
@@ -26,213 +17,111 @@
     :root {
       --bg: #0f1115;
       --card: #171a21;
-      --card-2: #1e222b;
       --accent: #2ea6ff;
-      --accent-2: #7c3aed;
       --ok: #22c55e;
       --err: #ef4444;
       --text: #e7eaf0;
       --muted: #8b93a7;
-      --border: rgba(255,255,255,.07);
     }
-
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    html, body {
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
       margin: 0;
-      padding: 0;
       background: var(--bg);
       color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       min-height: 100vh;
-      overscroll-behavior: none;
-      -webkit-font-smoothing: antialiased;
     }
-
-    body {
-      background:
-        radial-gradient(circle at 20% 0%, rgba(46,166,255,.08), transparent 40%),
-        radial-gradient(circle at 90% 10%, rgba(124,58,237,.08), transparent 40%),
-        var(--bg);
-    }
-
     .wrap {
       max-width: 480px;
       margin: 0 auto;
-      padding: 20px 16px calc(40px + env(safe-area-inset-bottom));
+      padding: 20px 16px 40px;
     }
-
-    /* ---------- Header ---------- */
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 16px;
-      padding: 0 4px;
-    }
-    .header-title {
-      font-size: 18px;
-      font-weight: 800;
-      letter-spacing: -0.3px;
-      background: linear-gradient(135deg, #2ea6ff, #7c3aed);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .header-badge {
-      font-size: 11px;
-      font-weight: 700;
-      padding: 4px 10px;
-      border-radius: 20px;
-      background: rgba(34,197,94,.15);
-      color: var(--ok);
-      letter-spacing: .3px;
-    }
-
-    /* ---------- Cards ---------- */
     .card {
       background: var(--card);
-      border-radius: 18px;
+      border-radius: 16px;
       padding: 20px;
       margin-bottom: 14px;
-      border: 1px solid var(--border);
-      box-shadow: 0 2px 12px rgba(0,0,0,.15);
+      border: 1px solid rgba(255,255,255,.06);
     }
-
-    /* ---------- User Row ---------- */
+    .balance {
+      font-size: 48px;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -1px;
+    }
+    .balance small {
+      font-size: 16px;
+      color: var(--muted);
+      font-weight: 500;
+      margin-left: 6px;
+    }
+    .label {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      font-weight: 700;
+    }
     .user {
       display: flex;
       align-items: center;
       gap: 12px;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
     }
     .avatar {
       width: 48px;
       height: 48px;
       border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      background: linear-gradient(135deg, #2ea6ff, #7c3aed);
       display: grid;
       place-items: center;
-      font-weight: 800;
+      font-weight: 700;
       font-size: 20px;
-      color: #fff;
       flex-shrink: 0;
       overflow: hidden;
-      border: 2px solid rgba(255,255,255,.08);
     }
     .avatar img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
-    .user-info {
-      min-width: 0;
-      flex: 1;
-    }
     .user-name {
       font-weight: 700;
       font-size: 16px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
     .user-id {
       color: var(--muted);
-      font-size: 12.5px;
+      font-size: 13px;
       margin-top: 2px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
-
-    /* ---------- Balance ---------- */
-    .label {
-      color: var(--muted);
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: .12em;
-      font-weight: 700;
-    }
-    .balance {
-      font-size: 46px;
-      font-weight: 800;
-      line-height: 1;
-      letter-spacing: -1.5px;
-      margin-top: 6px;
-      display: flex;
-      align-items: baseline;
-      gap: 8px;
-    }
-    .balance small {
-      font-size: 15px;
-      color: var(--muted);
-      font-weight: 500;
-      letter-spacing: 0;
-    }
-    .balance.bump {
-      animation: bump .4s ease;
-    }
-    @keyframes bump {
-      0%   { transform: scale(1); }
-      40%  { transform: scale(1.06); color: var(--ok); }
-      100% { transform: scale(1); }
-    }
-
-    /* ---------- Button ---------- */
-    .btn {
+    button {
       width: 100%;
       border: 0;
       border-radius: 14px;
-      padding: 17px 20px;
-      font-size: 16px;
+      padding: 18px;
+      font-size: 17px;
       font-weight: 700;
       color: #fff;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      background: linear-gradient(135deg, #2ea6ff, #7c3aed);
       cursor: pointer;
-      transition: transform .08s ease, opacity .2s ease, box-shadow .2s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      box-shadow: 0 6px 20px rgba(46,166,255,.25);
+      transition: transform .08s ease, opacity .2s ease;
     }
-    .btn:active:not(:disabled) {
-      transform: scale(.97);
-      box-shadow: 0 4px 14px rgba(46,166,255,.2);
-    }
-    .btn:disabled {
-      opacity: .45;
-      cursor: not-allowed;
-      box-shadow: none;
-    }
-    .btn-reward {
-      font-size: 14px;
-      font-weight: 800;
-      padding: 4px 10px;
-      background: rgba(255,255,255,.18);
-      border-radius: 20px;
-    }
-
-    /* ---------- Status ---------- */
+    button:active { transform: scale(.97); }
+    button:disabled { opacity: .45; cursor: not-allowed; }
     .status {
       margin-top: 14px;
-      font-size: 13.5px;
+      font-size: 14px;
       text-align: center;
       min-height: 22px;
       color: var(--muted);
-      line-height: 1.5;
+      line-height: 1.4;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
     }
-    .status.ok  { color: var(--ok); font-weight: 600; }
+    .status.ok { color: var(--ok); font-weight: 600; }
     .status.err { color: var(--err); font-weight: 600; }
-
-    /* ---------- Spinner ---------- */
     .spinner {
       display: inline-block;
       width: 14px;
@@ -241,326 +130,118 @@
       border-top-color: var(--accent);
       border-radius: 50%;
       animation: spin .7s linear infinite;
-      flex-shrink: 0;
     }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    /* ---------- Info card ---------- */
+    @keyframes spin { to { transform: rotate(360deg); } }
     .note {
-      font-size: 12.5px;
+      font-size: 12px;
       color: var(--muted);
-      line-height: 1.75;
+      line-height: 1.7;
     }
-    .note strong {
-      color: var(--text);
-      font-weight: 600;
-    }
-    .note code {
-      background: rgba(255,255,255,.06);
-      padding: 2px 6px;
-      border-radius: 5px;
-      font-size: 11.5px;
-      color: var(--accent);
-    }
-
-    /* ---------- Stats row ---------- */
-    .stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 4px;
-    }
-    .stat {
-      background: var(--card-2);
-      border-radius: 12px;
-      padding: 12px 14px;
-      border: 1px solid var(--border);
-    }
-    .stat-label {
-      font-size: 11px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
-    .stat-value {
-      font-size: 18px;
-      font-weight: 800;
-    }
-    .stat-value.accent { color: var(--accent); }
   </style>
 </head>
 <body>
   <div class="wrap">
 
-    <div class="header">
-      <div class="header-title">💰 Coin Earn</div>
-      <div class="header-badge" id="connBadge">● Offline</div>
-    </div>
-
-    <!-- Profile + Balance -->
     <div class="card">
       <div class="user">
         <div class="avatar" id="avatar">?</div>
-        <div class="user-info">
+        <div>
           <div class="user-name" id="userName">Loading…</div>
           <div class="user-id" id="userId">—</div>
         </div>
       </div>
-
       <div class="label">Your Balance</div>
-      <div class="balance" id="balance">
-        <span id="balanceNum">0</span><small>coins</small>
-      </div>
+      <div class="balance" id="balance">0<small>coins</small></div>
     </div>
 
-    <!-- Watch Ad Button -->
     <div class="card">
-      <button id="watchBtn" class="btn" disabled>
-        <span>🎬 Watch Ad</span>
-        <span class="btn-reward">+5</span>
-      </button>
-      <div class="status" id="status">
-        <span class="spinner"></span>Initializing…
-      </div>
+      <button id="watchBtn" disabled>🎬 Watch Ad — Earn 5 Coins</button>
+      <div class="status" id="status">Initializing…</div>
     </div>
 
-    <!-- Stats -->
-    <div class="card">
-      <div class="stats">
-        <div class="stat">
-          <div class="stat-label">Reward / Ad</div>
-          <div class="stat-value accent">5 coins</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">Zone</div>
-          <div class="stat-value">12008763</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Info -->
     <div class="card">
       <div class="note">
-        ✅ Reward <strong>only credited</strong> when Monetag's server sends a verified
-        postback to backend. Frontend never adds coins directly.<br><br>
-        🔒 Duplicate protection via unique <code>ymid</code> per ad event.
+        🧪 <strong>Test Mode:</strong> Coins browser mein store ho rahe hain.
+        Real earnings ke liye backend + Firebase postback chahiye.
       </div>
     </div>
 
   </div>
 
-  <script type="module">
+  <script>
 /* ============================================================
-   CONFIG
+   AD TEST — Browser Only
    ============================================================ */
-const CONFIG = {
-  MONETAG_ZONE_ID: "12008763",
-  MONETAG_SDK_FN: "show_12008763",
-  REWARD_COINS: 5,
 
-  // ⚠️ APNA VERCEL URL DAALO — yahan trailing slash nahi lagana
-  // Example: "https://coin-earn-app.vercel.app/api"
-  API_BASE: "https://my-live-stream-delta.vercel.app/api",
-
-  FIREBASE: {
-    apiKey: "AIzaSyC7nVNy-yMFCfrJBCQhnsYPDByIt1dks7Y",
-    authDomain: "bizzsite-64a49.firebaseapp.com",
-    databaseURL: "https://bizzsite-64a49-default-rtdb.firebaseio.com",
-    projectId: "bizzsite-64a49",
-    storageBucket: "bizzsite-64a49.firebasestorage.app",
-    messagingSenderId: "679795665521",
-    appId: "1:679795665521:web:68a70ebb310a40365f09d0",
-  },
-
-  REWARD_POLL_INTERVAL_MS: 1500,
-  REWARD_POLL_TIMEOUT_MS: 60000,
-};
-
-/* ============================================================
-   FIREBASE IMPORTS
-   ============================================================ */
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {
-  getAuth,
-  signInWithCustomToken,
-  onAuthStateChanged,
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import {
-  getDatabase,
-  ref,
-  onValue,
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-/* ============================================================
-   INIT
-   ============================================================ */
-const firebaseApp = initializeApp(CONFIG.FIREBASE);
-const auth = getAuth(firebaseApp);
-const db = getDatabase(firebaseApp);
+const STORAGE_KEY = 'coin_earn_balance_v1';
+const REWARD_COINS = 5;
+const SDK_FN = 'show_12008763';
 
 const tg = window.Telegram?.WebApp;
 if (tg) {
   tg.ready();
   tg.expand();
   tg.disableVerticalSwipes?.();
-  tg.setHeaderColor?.("#0f1115");
-  tg.setBackgroundColor?.("#0f1115");
+  tg.setHeaderColor?.('#0f1115');
+  tg.setBackgroundColor?.('#0f1115');
 }
 
-/* ============================================================
-   DOM
-   ============================================================ */
 const el = {
-  avatar: document.getElementById("avatar"),
-  userName: document.getElementById("userName"),
-  userId: document.getElementById("userId"),
-  balance: document.getElementById("balance"),
-  balanceNum: document.getElementById("balanceNum"),
-  watchBtn: document.getElementById("watchBtn"),
-  status: document.getElementById("status"),
-  connBadge: document.getElementById("connBadge"),
+  avatar: document.getElementById('avatar'),
+  userName: document.getElementById('userName'),
+  userId: document.getElementById('userId'),
+  balance: document.getElementById('balance'),
+  watchBtn: document.getElementById('watchBtn'),
+  status: document.getElementById('status'),
 };
 
-function setStatus(html, kind = "") {
+let balance = 0;
+let adInFlight = false;
+
+function setStatus(html, kind = '') {
   el.status.innerHTML = html;
-  el.status.className = "status" + (kind ? " " + kind : "");
+  el.status.className = 'status' + (kind ? ' ' + kind : '');
 }
 
-function setBalance(n) {
-  el.balanceNum.textContent = n;
-  el.balance.classList.remove("bump");
-  // Trigger reflow to restart animation
-  void el.balance.offsetWidth;
-  el.balance.classList.add("bump");
+function loadBalance() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  const n = parseInt(raw, 10);
+  balance = Number.isFinite(n) && n >= 0 ? n : 0;
+  el.balance.innerHTML = `${balance}<small>coins</small>`;
 }
 
-function setConnection(online) {
-  el.connBadge.textContent = online ? "● Online" : "● Offline";
-  el.connBadge.style.background = online
-    ? "rgba(34,197,94,.15)"
-    : "rgba(239,68,68,.15)";
-  el.connBadge.style.color = online ? "#22c55e" : "#ef4444";
-}
-
-/* ============================================================
-   STATE
-   ============================================================ */
-const state = {
-  uid: null,
-  balance: 0,
-  adInFlight: false,
-};
-
-/* ============================================================
-   1. TELEGRAM AUTH → Firebase custom token
-   ============================================================ */
-async function authenticateWithBackend() {
-  const initData = tg?.initData;
-  if (!initData) {
-    throw new Error("Telegram initData nahi mila. Mini App ke andar kholo.");
-  }
-
-  const res = await fetch(`${CONFIG.API_BASE}/auth/telegram`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ initData }),
-  });
-
-  if (!res.ok) {
-    const t = await res.text().catch(() => "");
-    throw new Error(`Telegram auth fail (${res.status}): ${t.slice(0, 120)}`);
-  }
-
-  const data = await res.json();
-  if (!data.customToken || !data.uid) {
-    throw new Error("Backend ne customToken ya uid nahi diya.");
-  }
-
-  await signInWithCustomToken(auth, data.customToken);
-
-  const u = data.user || {};
-  el.userName.textContent =
-    [u.first_name, u.last_name].filter(Boolean).join(" ") || "Telegram User";
-  el.userId.textContent = u.username ? `@${u.username}` : `ID: ${u.id || data.uid}`;
-
-  if (u.photo_url) {
-    el.avatar.innerHTML = `<img src="${u.photo_url}" alt="" />`;
-  } else {
-    el.avatar.textContent = (u.first_name?.[0] || "?").toUpperCase();
-  }
-
-  state.uid = data.uid;
-  return data;
-}
-
-/* ============================================================
-   2. LIVE BALANCE LISTENER
-   ============================================================ */
-let unsubBalance = null;
-
-function listenBalance(uid) {
-  if (unsubBalance) unsubBalance();
-  const coinsRef = ref(db, `users/${uid}/coins`);
-  unsubBalance = onValue(
-    coinsRef,
-    (snap) => {
-      const val = snap.val();
-      const n = typeof val === "number" && Number.isFinite(val) ? val : 0;
-      const prev = state.balance;
-      state.balance = n;
-      if (n !== prev) setBalance(n);
-    },
-    (err) => {
-      console.warn("[balance listener]", err);
-    }
+function addCoins(n) {
+  balance += n;
+  localStorage.setItem(STORAGE_KEY, String(balance));
+  el.balance.innerHTML = `${balance}<small>coins</small>`;
+  el.balance.animate(
+    [{ transform: 'scale(1)' }, { transform: 'scale(1.1)' }, { transform: 'scale(1)' }],
+    { duration: 400 }
   );
 }
 
-/* ============================================================
-   3. AD SESSION — unique ymid from backend
-   ============================================================ */
-async function requestAdSession() {
-  if (!auth.currentUser) throw new Error("Login nahi hai.");
-  const idToken = await auth.currentUser.getIdToken(true);
-
-  const res = await fetch(`${CONFIG.API_BASE}/ad/session`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${idToken}`,
-    },
-    body: JSON.stringify({ zoneId: CONFIG.MONETAG_ZONE_ID }),
-  });
-
-  if (!res.ok) {
-    const t = await res.text().catch(() => "");
-    throw new Error(`Ad session fail (${res.status}): ${t.slice(0, 120)}`);
+function loadTelegramUser() {
+  const u = tg?.initDataUnsafe?.user;
+  if (!u) {
+    el.userName.textContent = 'Telegram User';
+    el.userId.textContent = 'Guest';
+    el.avatar.textContent = '?';
+    return;
   }
-
-  const data = await res.json();
-  if (!data.ymid || !data.sessionId) {
-    throw new Error("Backend ne ymid/sessionId nahi diya.");
+  el.userName.textContent = [u.first_name, u.last_name].filter(Boolean).join(' ') || 'User';
+  el.userId.textContent = u.username ? '@' + u.username : 'ID: ' + u.id;
+  if (u.photo_url) {
+    el.avatar.innerHTML = `<img src="${u.photo_url}" alt="">`;
+  } else {
+    el.avatar.textContent = (u.first_name?.[0] || '?').toUpperCase();
   }
-  return data;
 }
 
-/* ============================================================
-   4. MONETAG SDK CALL — pass ymid
-   ============================================================ */
-function callMonetagSdk({ ymid }) {
+function showAd() {
   return new Promise((resolve, reject) => {
-    const fn = window[CONFIG.MONETAG_SDK_FN];
-    if (typeof fn !== "function") {
-      return reject(
-        new Error(
-          `Monetag SDK '${CONFIG.MONETAG_SDK_FN}' load nahi hua. ` +
-            `Dashboard ka exact <script> tag check karo.`
-        )
-      );
+    const fn = window[SDK_FN];
+    if (typeof fn !== 'function') {
+      return reject(new Error('Monetag SDK load nahi hua. Zone 12008763 ka tag check karo.'));
     }
 
     let settled = false;
@@ -571,20 +252,23 @@ function callMonetagSdk({ ymid }) {
       ok ? resolve(payload) : reject(payload);
     };
 
-    const guard = setTimeout(
-      () => done(false, new Error("Ad timeout — 2 min se zyada lag gaya.")),
-      130000
-    );
+    const guard = setTimeout(() => done(false, new Error('Ad timeout (2 min)')), 120000);
+
+    const ymid = 'test_' + Date.now() + '_' + Math.random().toString(36).slice(2, 10);
+    console.log('[AD] ymid:', ymid);
 
     try {
-      const p = fn({ ymid });
-
-      if (p && typeof p.then === "function") {
-        p.then(() => done(true, { via: "promise" }))
-          .catch((e) => done(false, e || new Error("Ad close/error")));
+      const p = fn({
+        ymid,
+        onReward: () => done(true, { via: 'onReward' }),
+        onClose: () => done(true, { via: 'onClose' }),
+        onError: (e) => done(false, e || new Error('SDK error')),
+      });
+      if (p && typeof p.then === 'function') {
+        p.then((r) => done(true, r)).catch((e) => done(false, e));
       } else {
-        // Fallback: kuch SDK versions promise return nahi karte
-        setTimeout(() => done(true, { via: "fallback" }), 5000);
+        // fallback: promise nahi, 8s baad maan lo complete
+        setTimeout(() => done(true, { via: 'fallback' }), 8000);
       }
     } catch (e) {
       done(false, e);
@@ -592,147 +276,35 @@ function callMonetagSdk({ ymid }) {
   });
 }
 
-/* ============================================================
-   5. WAIT FOR REWARD CONFIRMATION (postback)
-   ------------------------------------------------------------
-   Vercel endpoint: GET /api/ad/status?sessionId=xxx
-   ============================================================ */
-async function waitForRewardConfirmation(sessionId, prevBalance) {
-  const start = Date.now();
-  const idToken = await auth.currentUser.getIdToken(true);
-
-  while (Date.now() - start < CONFIG.REWARD_POLL_TIMEOUT_MS) {
-    try {
-      const res = await fetch(
-        `${CONFIG.API_BASE}/ad/status?sessionId=${encodeURIComponent(sessionId)}`,
-        { headers: { Authorization: `Bearer ${idToken}` } }
-      );
-      if (res.ok) {
-        const data = await res.json();
-        if (data.status === "credited") {
-          return { credited: true, coins: data.coins ?? CONFIG.REWARD_COINS };
-        }
-        if (data.status === "rejected") {
-          return {
-            credited: false,
-            reason: data.reason || "Ad reject ho gaya.",
-          };
-        }
-      }
-    } catch (_) {
-      // network glitch — retry
-    }
-
-    // Fast path: Firebase listener already updated
-    if (state.balance > prevBalance) {
-      return { credited: true, coins: state.balance - prevBalance };
-    }
-
-    await new Promise((r) => setTimeout(r, CONFIG.REWARD_POLL_INTERVAL_MS));
-  }
-  return { credited: false, reason: "Reward timeout — postback nahi aaya." };
-}
-
-/* ============================================================
-   6. WATCH AD — main flow
-   ============================================================ */
 async function handleWatchAd() {
-  if (state.adInFlight) return;
-  if (!auth.currentUser) {
-    setStatus("Login complete hone do…", "err");
-    return;
-  }
-
-  state.adInFlight = true;
+  if (adInFlight) return;
+  adInFlight = true;
   el.watchBtn.disabled = true;
-  const prevBalance = state.balance;
 
   try {
-    setStatus('<span class="spinner"></span>Ad session ban raha hai…');
-
-    // 1. Backend se unique ymid
-    const session = await requestAdSession();
-
     setStatus('<span class="spinner"></span>Ad load ho raha hai…');
-
-    // 2. Monetag SDK
-    await callMonetagSdk({ ymid: session.ymid });
-
-    // 3. Backend postback wait
-    setStatus(
-      '<span class="spinner"></span>Ad complete — reward verify ho raha hai…'
-    );
-    const result = await waitForRewardConfirmation(
-      session.sessionId,
-      prevBalance
-    );
-
-    if (result.credited) {
-      setStatus(`🎉 +${result.coins} coins credit ho gaye!`, "ok");
-      tg?.HapticFeedback?.notificationOccurred("success");
-    } else {
-      setStatus(result.reason || "Reward nahi mila.", "err");
-      tg?.HapticFeedback?.notificationOccurred("error");
-    }
-  } catch (err) {
-    console.error("[watchAd]", err);
-    setStatus(err?.message || "Ad fail ho gaya.", "err");
+    await showAd();
+    setStatus('<span class="spinner"></span>Reward add ho raha hai…');
+    await new Promise((r) => setTimeout(r, 400));
+    addCoins(REWARD_COINS);
+    setStatus(`🎉 +${REWARD_COINS} coins mil gaye!`, 'ok');
+    tg?.HapticFeedback?.notificationOccurred('success');
+  } catch (e) {
+    console.error('[watchAd]', e);
+    setStatus(e?.message || 'Ad fail ho gaya.', 'err');
+    tg?.HapticFeedback?.notificationOccurred('error');
   } finally {
-    state.adInFlight = false;
+    adInFlight = false;
     el.watchBtn.disabled = false;
   }
 }
 
-/* ============================================================
-   7. BOOT
-   ============================================================ */
-async function boot() {
-  el.watchBtn.disabled = true;
-  setStatus('<span class="spinner"></span>Telegram login verify ho raha hai…');
+loadBalance();
+loadTelegramUser();
+el.watchBtn.disabled = false;
+setStatus('Ready — ad dekh ke test karo! 🚀', 'ok');
 
-  // Backend reachability check (optional but helpful)
-  try {
-    const h = await fetch(`${CONFIG.API_BASE}/health`).catch(() => null);
-    if (!h || !h.ok) {
-      console.warn("[health] backend not reachable:", CONFIG.API_BASE);
-    }
-  } catch (_) {}
-
-  try {
-    await authenticateWithBackend();
-    setConnection(true);
-
-    setStatus('<span class="spinner"></span>Realtime sync ho raha hai…');
-    listenBalance(state.uid);
-
-    // Chhota wait for first snapshot
-    await new Promise((r) => setTimeout(r, 700));
-
-    el.watchBtn.disabled = false;
-    setStatus("Ready — ad dekh ke coins kamao! 🚀", "ok");
-  } catch (err) {
-    console.error("[boot]", err);
-    setConnection(false);
-    setStatus(err?.message || "Init fail.", "err");
-  }
-}
-
-/* ============================================================
-   LISTENERS
-   ============================================================ */
-el.watchBtn.addEventListener("click", handleWatchAd);
-
-onAuthStateChanged(auth, (user) => {
-  if (user && !state.uid) {
-    state.uid = user.uid;
-    listenBalance(user.uid);
-  }
-});
-
-window.addEventListener("online", () => setConnection(true));
-window.addEventListener("offline", () => setConnection(false));
-
-boot();
+el.watchBtn.addEventListener('click', handleWatchAd);
   </script>
 </body>
 </html>
